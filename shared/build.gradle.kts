@@ -44,6 +44,7 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
                 implementation("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
+                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
             }
         }
         val androidTest by getting

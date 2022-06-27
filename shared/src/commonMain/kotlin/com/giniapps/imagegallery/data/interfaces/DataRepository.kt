@@ -14,7 +14,7 @@ interface DataRepository {
     suspend fun getPhotosForAlbumAndSaveToCache(albumId: Long): List<Photo>
     suspend fun getPhotosForAlbumFromCache(albumId: Long): List<Photo>
     suspend fun getDataForUserAndSaveToCache(userId: Long)
-    suspend fun login(user: User)
+    suspend fun login(userId: Long)
     suspend fun isUserLoggedIn(): Boolean
     suspend fun getLoggedInUserId(): Long
     suspend fun logout()

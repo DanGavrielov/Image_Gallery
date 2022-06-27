@@ -40,9 +40,9 @@ class PlaceholderDataRepository(
         }
     }
 
-    override suspend fun login(user: User) {
-        preferences.saveLoggedUserDetails(user.id)
-        getDataForUserAndSaveToCache(user.id)
+    override suspend fun login(userId: Long) {
+        preferences.saveLoggedUserDetails(userId)
+        getDataForUserAndSaveToCache(userId)
     }
 
     override suspend fun isUserLoggedIn() =
