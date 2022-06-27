@@ -1,7 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    kotlin("plugin.serialization") version "1.7.0"
+    kotlin("plugin.serialization") version "1.6.21"
     id("com.squareup.sqldelight")
 }
 
@@ -48,6 +48,7 @@ kotlin {
                 api("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
                 api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
                 api("io.insert-koin:koin-android:$koinVersion")
+                api("io.insert-koin:koin-androidx-compose:$koinVersion")
             }
         }
         val androidTest by getting

@@ -16,8 +16,6 @@ import kotlinx.serialization.json.Json
 internal class PlaceholderApiService(
     private val httpApiClient: HttpClient
 ) : DataSource {
-//    private val httpApiClient: HttpClient =
-
     override suspend fun getUsers(): List<User> {
         return try {
             httpApiClient.get {

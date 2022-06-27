@@ -1,6 +1,6 @@
 package com.giniapps.imagegallery.data
 
-import com.giniapps.AppDatabase
+import com.giniapps.imagegallery.AppDatabase
 import com.giniapps.imagegallery.database.DatabaseDriverFactory
 import com.giniapps.imagegallery.data.interfaces.Cache
 import com.giniapps.imagegallery.models.Album

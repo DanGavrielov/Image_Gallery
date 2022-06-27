@@ -8,6 +8,10 @@ import com.giniapps.imagegallery.data.interfaces.DataRepository
 import com.giniapps.imagegallery.data.interfaces.DataSource
 import com.giniapps.imagegallery.data.interfaces.Preferences
 import com.giniapps.imagegallery.user_prefs.UserPreferences
+import com.giniapps.imagegallery.view_models.AlbumListViewModel
+import com.giniapps.imagegallery.view_models.LoginViewModel
+import com.giniapps.imagegallery.view_models.PhotoListViewModel
+import com.giniapps.imagegallery.view_models.SplashViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -21,6 +25,7 @@ fun initKoin(appDeclaration: KoinAppDeclaration = { }) {
         appDeclaration()
         modules(
             repositoryModule,
+            viewModelModule,
             platformModule()
         )
     }
@@ -65,4 +70,11 @@ val repositoryModule = module {
             preferences = get()
         )
     }
+}
+
+val viewModelModule = module {
+    factory { SplashViewModel(repository = get()) }
+    factory { LoginViewModel(repository = get()) }
+    factory { AlbumListViewModel(repository = get()) }
+    factory { PhotoListViewModel(repository = get()) }
 }
