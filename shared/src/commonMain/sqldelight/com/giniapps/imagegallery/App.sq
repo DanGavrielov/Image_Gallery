@@ -1,0 +1,35 @@
+CREATE TABLE albums(
+    userId INTEGER NOT NULL,
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL
+);
+
+insertAlbum:
+INSERT OR REPLACE
+INTO albums(userId, id, title)
+VALUES (?, ?, ?);
+
+getAlbums:
+SELECT * FROM albums;
+
+deleteAlbums:
+DELETE FROM albums;
+
+CREATE TABLE photos(
+    albumId INTEGER NOT NULL,
+    id INTEGER NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    url TEXT NOT NULL,
+    thumbnailUrl TEXT NOT NULL
+);
+
+insertPhoto:
+INSERT OR REPLACE
+INTO photos(albumId, id, title, url, thumbnailUrl)
+VALUES (?, ?, ?, ?, ?);
+
+getPhotosForAlbumId:
+SELECT * FROM photos WHERE albumId = ?;
+
+deletePhotos:
+DELETE FROM photos;
