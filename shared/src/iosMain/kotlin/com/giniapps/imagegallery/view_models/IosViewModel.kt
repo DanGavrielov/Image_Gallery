@@ -8,7 +8,7 @@ import kotlin.coroutines.CoroutineContext
 
 actual abstract class SharedViewModel {
     private var hasCleared = false
-    actual val scope: CoroutineScope by lazy {
+    actual val coroutineScope: CoroutineScope by lazy {
         val result = CloseableCoroutineScope(SupervisorJob() + Dispatchers.Main)
 
         if (hasCleared)
@@ -21,7 +21,7 @@ actual abstract class SharedViewModel {
 
     fun clear() {
         hasCleared = true
-        closeWithRuntimeException(scope)
+        closeWithRuntimeException(coroutineScope)
         onCleared()
     }
 

@@ -6,7 +6,6 @@ import com.giniapps.imagegallery.data.interfaces.DataSource
 import com.giniapps.imagegallery.data.interfaces.Preferences
 import com.giniapps.imagegallery.models.Album
 import com.giniapps.imagegallery.models.Photo
-import com.giniapps.imagegallery.models.User
 
 class PlaceholderDataRepository(
     override val dataSource: DataSource,
@@ -15,14 +14,16 @@ class PlaceholderDataRepository(
 ) : DataRepository {
     override suspend fun getUsers() = dataSource.getUsers()
 
-    override suspend fun getAlbumsForUser(userId: Long): List<Album> {
+    override suspend fun getAlbumsForUserAndSaveToCache(userId: Long): List<Album> {
         val albums = dataSource.getAlbumsForUser(userId)
         cache.insertAlbums(albums)
         return albums
     }
 
-    override suspend fun getAlbumsFromCache() =
-        cache.getAlbums()
+    override suspend fun getAlbumsFromCache(userId: Long) =
+        cache.getAlbums().ifEmpty {
+            getAlbumsForUserAndSaveToCache(userId)
+        }
 
     override suspend fun getPhotosForAlbumAndSaveToCache(albumId: Long): List<Photo> {
         val photos = dataSource.getPhotosForAlbum(albumId)
@@ -31,22 +32,16 @@ class PlaceholderDataRepository(
     }
 
     override suspend fun getPhotosForAlbumFromCache(albumId: Long) =
-        cache.getPhotosForAlbumId(albumId)
-
-    override suspend fun getDataForUserAndSaveToCache(userId: Long) {
-        val albums = getAlbumsForUser(userId)
-        albums.forEach {
-            getPhotosForAlbumAndSaveToCache(it.id)
+        cache.getPhotosForAlbumId(albumId).ifEmpty {
+            getPhotosForAlbumAndSaveToCache(albumId)
         }
-    }
 
     override suspend fun login(userId: Long) {
         preferences.saveLoggedUserDetails(userId)
-        getDataForUserAndSaveToCache(userId)
     }
 
     override suspend fun isUserLoggedIn() =
-        preferences.getLoggedUserDetails() > -1
+        preferences.getLoggedUserDetails() != -1L
 
     override suspend fun getLoggedInUserId() =
         preferences.getLoggedUserDetails()
