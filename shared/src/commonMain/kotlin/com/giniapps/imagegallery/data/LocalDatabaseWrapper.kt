@@ -6,7 +6,7 @@ import com.giniapps.imagegallery.data.interfaces.Cache
 import com.giniapps.imagegallery.models.Album
 import com.giniapps.imagegallery.models.Photo
 
-internal class Database(databaseDriverFactory: DatabaseDriverFactory): Cache {
+internal class LocalDatabaseWrapper(databaseDriverFactory: DatabaseDriverFactory): Cache {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
     private val queries = database.appQueries
 

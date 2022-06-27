@@ -13,25 +13,10 @@ import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
-internal class PlaceholderApiService : DataSource {
-    private val httpApiClient: HttpClient = HttpClient {
-        install(Logging) {
-            level = LogLevel.ALL
-        }
-        // JSON
-        install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-            })
-        }
-        // Timeout
-        install(HttpTimeout) {
-            requestTimeoutMillis = 15000L
-            connectTimeoutMillis = 15000L
-            socketTimeoutMillis = 15000L
-        }
-    }
+internal class PlaceholderApiService(
+    private val httpApiClient: HttpClient
+) : DataSource {
+//    private val httpApiClient: HttpClient =
 
     override suspend fun getUsers(): List<User> {
         return try {
