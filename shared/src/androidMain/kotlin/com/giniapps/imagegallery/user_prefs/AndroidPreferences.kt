@@ -1,6 +1,7 @@
 package com.giniapps.imagegallery.user_prefs
 
 import android.content.Context
+import android.content.SharedPreferences
 
 private const val PrefName = "prefs"
 private const val UserIdPrefKey = "user_id"
@@ -17,4 +18,7 @@ actual fun KMMContext.getLoggedUserDetails(): Long {
         .getLong(UserIdPrefKey, -1)
 }
 
-private fun KMMContext.getSharedPrefs() = getSharedPreferences(PrefName, Context.MODE_PRIVATE)
+private fun KMMContext.getSharedPrefs(): SharedPreferences {
+    val context = this
+    return context.getSharedPreferences(PrefName, Context.MODE_PRIVATE)
+}

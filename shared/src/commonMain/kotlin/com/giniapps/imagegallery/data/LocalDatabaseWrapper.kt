@@ -52,6 +52,17 @@ internal class LocalDatabaseWrapper(databaseDriverFactory: DatabaseDriverFactory
             )
         }
 
+    override suspend fun getPhotoById(photoId: Long): Photo {
+        val result = queries.getPhotoById(photoId).executeAsOne()
+        return Photo(
+            albumId = result.albumId,
+            id = result.id,
+            title = result.title,
+            url = result.url,
+            thumbnailUrl = result.thumbnailUrl
+        )
+    }
+
     override suspend fun clearDatabase() {
         queries.transaction {
             queries.deleteAlbums()

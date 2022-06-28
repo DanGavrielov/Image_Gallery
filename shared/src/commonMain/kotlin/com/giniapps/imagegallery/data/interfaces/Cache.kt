@@ -8,5 +8,6 @@ interface Cache {
     suspend fun getAlbums(): List<Album>
     suspend fun insertPhotos(photos: List<Photo>)
     suspend fun getPhotosForAlbumId(albumId: Long): List<Photo>
+    suspend fun getPhotoById(photoId: Long): Photo
     suspend fun clearDatabase()
 }

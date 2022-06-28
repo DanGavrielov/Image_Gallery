@@ -2,4 +2,7 @@
 <resources>
     <string name="select_user">Select User</string>
     <string name="login">Login</string>
+    <string name="login_screen_title">Login to view your photos</string>
+    <string name="logout">Logout</string>
+    <string name="go_back">Go Back</string>
 </resources>

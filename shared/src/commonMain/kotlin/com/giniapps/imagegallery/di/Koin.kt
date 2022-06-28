@@ -8,10 +8,7 @@ import com.giniapps.imagegallery.data.interfaces.DataRepository
 import com.giniapps.imagegallery.data.interfaces.DataSource
 import com.giniapps.imagegallery.data.interfaces.Preferences
 import com.giniapps.imagegallery.user_prefs.UserPreferences
-import com.giniapps.imagegallery.view_models.AlbumListViewModel
-import com.giniapps.imagegallery.view_models.LoginViewModel
-import com.giniapps.imagegallery.view_models.PhotoListViewModel
-import com.giniapps.imagegallery.view_models.SplashViewModel
+import com.giniapps.imagegallery.view_models.*
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -57,12 +54,6 @@ val repositoryModule = module {
         )
     }
 
-    factory<Preferences> {
-        UserPreferences(
-            context = get()
-        )
-    }
-
     factory<DataRepository> {
         PlaceholderDataRepository(
             dataSource = get(),
@@ -77,4 +68,5 @@ val viewModelModule = module {
     factory { LoginViewModel(repository = get()) }
     factory { AlbumListViewModel(repository = get()) }
     factory { PhotoListViewModel(repository = get()) }
+    factory { ViewPhotoViewModel(repository = get()) }
 }

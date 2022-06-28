@@ -7,13 +7,12 @@ import kotlinx.coroutines.launch
 class SplashViewModel(
     private val repository: DataRepository
 ): SharedViewModel() {
-    val isUserLoggedInState = MutableStateFlow(false)
-
-    init {
-        coroutineScope.launch {
-            isUserLoggedInState.emit(
-                repository.isUserLoggedIn()
-            )
+    suspend fun isUserLoggedIn(): Boolean {
+        var loggedIn = false
+        val job = coroutineScope.launch {
+            loggedIn = repository.isUserLoggedIn()
         }
+        job.join()
+        return loggedIn
     }
 }

@@ -6,4 +6,5 @@ import com.giniapps.imagegallery.user_prefs.saveLoggedUserDetails
 interface Preferences {
     fun saveLoggedUserDetails(userId: Long)
     fun getLoggedUserDetails(): Long
+    fun clearLoggedUser()
 }

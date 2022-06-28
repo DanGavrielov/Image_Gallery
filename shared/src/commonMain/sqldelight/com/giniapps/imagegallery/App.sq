@@ -31,5 +31,8 @@ VALUES (?, ?, ?, ?, ?);
 getPhotosForAlbumId:
 SELECT * FROM photos WHERE albumId = ?;
 
+getPhotoById:
+SELECT * FROM photos WHERE id = ?;
+
 deletePhotos:
 DELETE FROM photos;

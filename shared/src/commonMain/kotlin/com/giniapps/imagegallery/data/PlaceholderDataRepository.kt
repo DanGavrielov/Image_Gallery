@@ -6,6 +6,7 @@ import com.giniapps.imagegallery.data.interfaces.DataSource
 import com.giniapps.imagegallery.data.interfaces.Preferences
 import com.giniapps.imagegallery.models.Album
 import com.giniapps.imagegallery.models.Photo
+import com.giniapps.imagegallery.models.User
 
 class PlaceholderDataRepository(
     override val dataSource: DataSource,
@@ -13,6 +14,9 @@ class PlaceholderDataRepository(
     override val preferences: Preferences
 ) : DataRepository {
     override suspend fun getUsers() = dataSource.getUsers()
+
+    override suspend fun getLoggedInUserDetails(userId: Long) =
+        dataSource.getLoggedInUserDetails(userId) ?: User.emptyObject()
 
     override suspend fun getAlbumsForUserAndSaveToCache(userId: Long): List<Album> {
         val albums = dataSource.getAlbumsForUser(userId)
@@ -36,6 +40,9 @@ class PlaceholderDataRepository(
             getPhotosForAlbumAndSaveToCache(albumId)
         }
 
+    override suspend fun getPhotoFromCacheById(photoId: Long) =
+        cache.getPhotoById(photoId)
+
     override suspend fun login(userId: Long) {
         preferences.saveLoggedUserDetails(userId)
     }
@@ -47,6 +54,7 @@ class PlaceholderDataRepository(
         preferences.getLoggedUserDetails()
 
     override suspend fun logout() {
+        preferences.clearLoggedUser()
         cache.clearDatabase()
     }
 

@@ -8,4 +8,8 @@ class UserPreferences(private val context: KMMContext): Preferences {
     }
 
     override fun getLoggedUserDetails() = context.getLoggedUserDetails()
+
+    override fun clearLoggedUser() {
+        saveLoggedUserDetails(userId = -1)
+    }
 }

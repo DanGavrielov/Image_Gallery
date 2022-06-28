@@ -9,10 +9,12 @@ interface DataRepository {
     val cache: Cache
     val preferences: Preferences
     suspend fun getUsers(): List<User>
+    suspend fun getLoggedInUserDetails(userId: Long): User
     suspend fun getAlbumsForUserAndSaveToCache(userId: Long): List<Album>
     suspend fun getAlbumsFromCache(userId: Long): List<Album>
     suspend fun getPhotosForAlbumAndSaveToCache(albumId: Long): List<Photo>
     suspend fun getPhotosForAlbumFromCache(albumId: Long): List<Photo>
+    suspend fun getPhotoFromCacheById(photoId: Long): Photo
     suspend fun login(userId: Long)
     suspend fun isUserLoggedIn(): Boolean
     suspend fun getLoggedInUserId(): Long

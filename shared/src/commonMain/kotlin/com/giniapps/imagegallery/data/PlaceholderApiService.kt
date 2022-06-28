@@ -36,6 +36,26 @@ internal class PlaceholderApiService(
         }
     }
 
+    override suspend fun getLoggedInUserDetails(userId: Long): User? {
+        return try {
+            httpApiClient.get {
+                url("https://jsonplaceholder.typicode.com/users/$userId")
+            }.body()
+        } catch (ex: RedirectResponseException) {
+            // 3xx - responses
+            println("Error: ${ex.response.status.description}")
+            null
+        } catch (ex: ClientRequestException) {
+            // 4xx - responses
+            println("Error: ${ex.response.status.description}")
+            null
+        } catch (ex: ServerResponseException) {
+            // 5xx - response
+            println("Error: ${ex.response.status.description}")
+            null
+        }
+    }
+
     override suspend fun getAlbumsForUser(userId: Long): List<Album> {
         return try {
             httpApiClient.get {
