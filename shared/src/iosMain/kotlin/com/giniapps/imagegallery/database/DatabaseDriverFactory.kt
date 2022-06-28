@@ -1,6 +1,6 @@
 package com.giniapps.imagegallery.database
 
-import com.giniapps.AppDatabase
+import com.giniapps.imagegallery.AppDatabase
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.drivers.native.NativeSqliteDriver
 

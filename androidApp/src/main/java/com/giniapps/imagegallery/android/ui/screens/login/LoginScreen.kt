@@ -18,6 +18,7 @@ fun LoginScreen(
 ) {
     val viewModel: LoginViewModel = getViewModel()
     val users by viewModel.usersState.collectAsState()
+    val userList = users.list
     var selectedOption by remember { mutableStateOf("") }
 
     Column(
@@ -30,7 +31,7 @@ fun LoginScreen(
         )
         Spacer(modifier = Modifier.height(24.dp))
         DropdownTextField(
-            options = users.map { it.email },
+            options = userList.map { it.email },
             selectedOption = selectedOption,
             onOptionSelected = { selectedOption = it }
         )
@@ -38,11 +39,9 @@ fun LoginScreen(
         Button(
             modifier = Modifier.width(200.dp),
             onClick = {
-                val user = users.find { it.email == selectedOption }
-                user?.let {
-                    viewModel.loginUser(it.id)
-                    onLogin()
-                }
+                val user = userList.first { it.email == selectedOption }
+                viewModel.loginUser(user.id)
+                onLogin()
             }
         ) {
             Text(text = stringResource(id = R.string.login))

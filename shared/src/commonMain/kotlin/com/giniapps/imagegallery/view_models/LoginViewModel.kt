@@ -8,11 +8,11 @@ import kotlinx.coroutines.launch
 class LoginViewModel(
     private val repository: DataRepository
 ): SharedViewModel() {
-    val usersState = MutableStateFlow(emptyList<User>())
+    val usersState = MutableStateFlow(Users(emptyList())).asCommonFlow()
     init {
         coroutineScope.launch {
             val users = repository.getUsers()
-            usersState.emit(users)
+            usersState.emit(Users(users))
         }
     }
 
@@ -22,3 +22,7 @@ class LoginViewModel(
         }
     }
 }
+
+data class Users(
+    val list: List<User>
+)

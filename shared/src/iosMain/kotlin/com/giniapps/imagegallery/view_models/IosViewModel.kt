@@ -27,9 +27,9 @@ actual abstract class SharedViewModel {
 
     companion object {
         private fun closeWithRuntimeException(obj: Any?) {
-            if (obj is Closeable) {
+            if (obj is Cancellable) {
                 try {
-                    obj.close()
+                    obj.cancel()
                 } catch (e: Exception) {
                     throw RuntimeException(e)
                 }
@@ -38,10 +38,10 @@ actual abstract class SharedViewModel {
     }
 }
 
-class CloseableCoroutineScope(context: CoroutineContext) : Closeable, CoroutineScope {
+class CloseableCoroutineScope(context: CoroutineContext) : Cancellable, CoroutineScope {
     override val coroutineContext: CoroutineContext = context
 
-    override fun close() {
+    override fun cancel() {
         coroutineContext.cancel()
     }
 

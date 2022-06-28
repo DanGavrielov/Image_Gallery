@@ -8,7 +8,7 @@ import com.giniapps.imagegallery.models.Photo
 
 internal class LocalDatabaseWrapper(databaseDriverFactory: DatabaseDriverFactory): Cache {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
-    private val queries = database.appQueries
+    private val queries = database.appDatabaseQueries
 
     override suspend fun insertAlbums(albums: List<Album>) {
         queries.transaction {
