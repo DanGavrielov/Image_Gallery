@@ -13,24 +13,34 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
+
 struct LoginScreen: View {
-    let viewModel = InjectionHelper.shared.loginViewModel
-    @State private var userList = [User]()
+    private let viewModel: LoginViewModel = InjectionHelper.shared.loginViewModel
+    private var userList: [User] = []
     
     init() {
-        viewModel.usersState.watch { users in
-            if let users = users {
-                userList = users.list
-            }
-        }
+        // Initialize data...
     }
     
     var body: some View {
         
-        return List {
-            Text("first")
-            Text("second")
-            Text("third")
+        List {
+            ForEach(userList, id: \.name) { name in
+                Text("\(name)")
+            }
         }
+        
+        /*
+        onChange(of: reloadsData) { newValue in
+            print("on change")
+            viewModel.usersState.watch { users in
+                print(users)
+                guard let users = users else { return }
+                
+                self.userList = users.list
+            }
+        }
+         */
+        
     }
 }
