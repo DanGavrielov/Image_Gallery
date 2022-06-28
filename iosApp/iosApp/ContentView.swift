@@ -15,28 +15,24 @@ struct ContentView_Previews: PreviewProvider {
 
 
 struct LoginScreen: View {
-    private let viewModel: LoginViewModel = InjectionHelper.shared.loginViewModel
-    private var userList: [User] = [.init(id: 123, name: "", username: "", email: "", address: .init(street: "", suite: "", city: "", zipcode: "", geo: .init(lat: "", lng: "")), phone: "", website: "", company: .init(name: "", catchPhrase: "", bs: ""))]
     
-    init() {
-        // Initialize data...
-        
-        // This is throwing the error "Escaping closure captures mutating 'self' parameter"...
-//        viewModel.usersState.watch { users in
-//            guard let users = users else { return }
-//            self.userList = users.list
-//        }
-        
-    }
+    
+    private let viewModel: LoginViewModel = InjectionHelper.shared.loginViewModel
+    
+    @State private var userList: [User] = []
+    
     
     var body: some View {
         
         List {
             ForEach(userList, id: \.name) { name in
                 Text("\(name)")
-                
-                // Here you can have a print statement wheneve you need to print something in the console.
-                let _ = print("added")
+            }
+            
+        }.onAppear {
+            viewModel.usersState.watch { users in
+                guard let users = users else { return }
+                self.userList = users.list
             }
         }
 
