@@ -7,93 +7,70 @@ import com.giniapps.imagegallery.models.User
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
 
 internal class PlaceholderApiService(
     private val httpApiClient: HttpClient
 ) : DataSource {
     override suspend fun getUsers(): List<User> {
-        return try {
-            httpApiClient.get {
-                url("https://jsonplaceholder.typicode.com/users")
-            }.body()
-        } catch (ex: RedirectResponseException) {
-            // 3xx - responses
-            println("Error: ${ex.response.status.description}")
-            emptyList()
-        } catch (ex: ClientRequestException) {
-            // 4xx - responses
-            println("Error: ${ex.response.status.description}")
-            emptyList()
-        } catch (ex: ServerResponseException) {
-            // 5xx - response
-            println("Error: ${ex.response.status.description}")
-            emptyList()
-        }
+        return makeRequest(
+            request = {
+                httpApiClient.get {
+                    url("https://jsonplaceholder.typicode.com/users")
+                }.body()
+            },
+            returnOnFailure = emptyList()
+        )
     }
 
-    override suspend fun getLoggedInUserDetails(userId: Long): User? {
-        return try {
-            httpApiClient.get {
-                url("https://jsonplaceholder.typicode.com/users/$userId")
-            }.body()
-        } catch (ex: RedirectResponseException) {
-            // 3xx - responses
-            println("Error: ${ex.response.status.description}")
-            null
-        } catch (ex: ClientRequestException) {
-            // 4xx - responses
-            println("Error: ${ex.response.status.description}")
-            null
-        } catch (ex: ServerResponseException) {
-            // 5xx - response
-            println("Error: ${ex.response.status.description}")
-            null
-        }
+    override suspend fun getLoggedInUserDetails(userId: Long): User {
+        return makeRequest(
+            request = {
+                httpApiClient.get {
+                    url("https://jsonplaceholder.typicode.com/users/$userId")
+                }.body()
+            },
+            returnOnFailure = User.emptyObject()
+        )
     }
 
     override suspend fun getAlbumsForUser(userId: Long): List<Album> {
-        return try {
-            httpApiClient.get {
-                url("https://jsonplaceholder.typicode.com/albums?userId=$userId")
-            }.body()
-        } catch (ex: RedirectResponseException) {
-            // 3xx - responses
-            println("Error: ${ex.response.status.description}")
-            emptyList()
-        } catch (ex: ClientRequestException) {
-            // 4xx - responses
-            println("Error: ${ex.response.status.description}")
-            emptyList()
-        } catch (ex: ServerResponseException) {
-            // 5xx - response
-            println("Error: ${ex.response.status.description}")
-            emptyList()
-        }
+        return makeRequest(
+            request = {
+                httpApiClient.get {
+                    url("https://jsonplaceholder.typicode.com/albums?userId=$userId")
+                }.body()
+            },
+            returnOnFailure = emptyList()
+        )
     }
 
     override suspend fun getPhotosForAlbum(albumId: Long): List<Photo> {
+        return makeRequest(
+            request = {
+                httpApiClient.get {
+                    url("https://jsonplaceholder.typicode.com/photos?albumId=$albumId")
+                }.body()
+            },
+            returnOnFailure = emptyList()
+        )
+    }
+
+    private suspend fun <T> makeRequest(request: suspend () -> T, returnOnFailure: T): T {
         return try {
-            httpApiClient.get {
-                url("https://jsonplaceholder.typicode.com/photos?albumId=$albumId")
-            }.body()
+            request()
         } catch (ex: RedirectResponseException) {
             // 3xx - responses
             println("Error: ${ex.response.status.description}")
-            emptyList()
+            returnOnFailure
         } catch (ex: ClientRequestException) {
             // 4xx - responses
             println("Error: ${ex.response.status.description}")
-            emptyList()
+            returnOnFailure
         } catch (ex: ServerResponseException) {
             // 5xx - response
             println("Error: ${ex.response.status.description}")
-            emptyList()
+            returnOnFailure
         }
     }
-
 }

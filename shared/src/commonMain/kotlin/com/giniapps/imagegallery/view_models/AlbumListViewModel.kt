@@ -4,20 +4,21 @@ import com.giniapps.imagegallery.data.interfaces.DataRepository
 import com.giniapps.imagegallery.models.Album
 import com.giniapps.imagegallery.models.AlbumWithThumbnail
 import com.giniapps.imagegallery.models.User
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class AlbumListViewModel(
     private val repository: DataRepository
 ): SharedViewModel() {
-    val loggedUser = MutableStateFlow(User.emptyObject())
-    val albums = MutableStateFlow(listOf<AlbumWithThumbnail>())
+    val loggedUser = MutableStateFlow(User.emptyObject()).asCommonFlow()
+    val albums = MutableStateFlow(Albums(emptyList())).asCommonFlow()
 
-    init {
+    fun initViewModel() {
         coroutineScope.launch {
             val userId = repository.getLoggedInUserId()
             albums.emit(
-                createAlbumsWithThumbnails(userId)
+                Albums(createAlbumsWithThumbnails(userId))
             )
             loggedUser.emit(
                 repository.getLoggedInUserDetails(userId)
@@ -42,3 +43,7 @@ class AlbumListViewModel(
         }
     }
 }
+
+data class Albums(
+    val list: List<AlbumWithThumbnail>
+)
