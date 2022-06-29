@@ -83,10 +83,6 @@ struct AlbumsScreen: View {
     @State private var goToPhotosScreen = false
     @State private var selectedAlbumID: Int64 = 0
     
-    private var items: [GridItem] {
-        Array(repeating: .init(.adaptive(minimum: 120)), count: 2)
-    }
-    
     var body: some View {
         VStack {
             if albums.isEmpty || loggedUser.name.isEmpty {
@@ -143,17 +139,18 @@ struct PhotosScreen: View {
     @State private var album = Album.Companion().emptyObject()
     @State private var photos: [Photo] = []
     @State private var viewPhoto = false
+    @State private var selectedPhoto = Photo.Companion().emptyObject()
     
     var body: some View {
         List(photos, id: \.id) { photo in
-            NavigationLink(destination: ViewPhotoScreen(photo: photo), isActive: $viewPhoto, label: { PhotoRow(photo: photo) })
+            PhotoRow(photo: photo)
                 .onTapGesture {
+                    selectedPhoto = photo
                     viewPhoto = true
                 }
         }.navigationTitle(album.title)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                print("Album ID passed to PhotosScreen ~> \(albumId)")
                 viewModel.getPhotosForAlbum(albumId: albumId)
                 viewModel.getAlbum(albumId: albumId)
                 viewModel.album.watch { album in
@@ -165,6 +162,8 @@ struct PhotosScreen: View {
                     self.photos = photos.list
                 }
             }
+        
+        NavigationLink(destination: ViewPhotoScreen(photo: selectedPhoto), isActive: $viewPhoto, label: { EmptyView() })
     }
 }
 
