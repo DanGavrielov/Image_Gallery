@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 class PhotoListViewModel(
     private val repository: DataRepository
 ): SharedViewModel() {
-    val loggedUser = MutableStateFlow(User.emptyObject())
-    val album = MutableStateFlow(Album.emptyObject())
-    val photos = MutableStateFlow(listOf<Photo>())
+    val loggedUser = MutableStateFlow(User.emptyObject()).asCommonFlow()
+    val album = MutableStateFlow(Album.emptyObject()).asCommonFlow()
+    val photos = MutableStateFlow(Photos(emptyList())).asCommonFlow()
 
     init {
         coroutineScope.launch {
@@ -34,7 +34,7 @@ class PhotoListViewModel(
     fun getPhotosForAlbum(albumId: Long) =
         coroutineScope.launch {
             photos.emit(
-                repository.getPhotosForAlbumFromCache(albumId)
+                Photos(repository.getPhotosForAlbumFromCache(albumId))
             )
         }
 
@@ -44,3 +44,7 @@ class PhotoListViewModel(
         }
     }
 }
+
+data class Photos(
+    val list: List<Photo>
+)

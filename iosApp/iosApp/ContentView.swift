@@ -3,99 +3,128 @@ import shared
 
 struct ContentView: View {
     var body: some View {
-        SplashScreen()
+        LoginScreen()
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        SplashScreen()
         LoginScreen()
         AlbumsScreen()
-    }
-}
-
-struct SplashScreen: View {
-    private let viewModel: SplashViewModel = InjectionHelper.shared.splashViewModel
-    @State private var goToLoginScreen = false
-    @State private var goToAlbumsScreen = false
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                NavigationLink(destination: LoginScreen().navigationBarBackButtonHidden(true), isActive: $goToLoginScreen) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .scaleEffect(2, anchor: .center)
-                }
-                NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbumsScreen) {
-                    EmptyView()
-                }
-            }
-        }.onAppear {
-            viewModel.isUserLoggedIn { userLoggedIn, _ in
-                guard let userLoggedIn = userLoggedIn else { return }
-                if userLoggedIn as! Bool {
-                    goToAlbumsScreen = true
-                } else {
-                    goToLoginScreen = true
-                }
-            }
-        }.onDisappear {
-            viewModel.clear()
-        }
     }
 }
 
 struct LoginScreen: View {
     private let viewModel: LoginViewModel = InjectionHelper.shared.loginViewModel
     @State private var userList: [User] = []
-    @State var selectedUser: User?
-    @State var pickerID = 0
+    @State private var goToAlbumsScreen = false
     
     var body: some View {
-        
-        VStack {
-            Picker(selection: $selectedUser, label: Text("Items: \(userList.count)")) {
-                ForEach(userList, id: \.self) { user in
-                    Text(user.email)
-                }
-            }
-            .id(pickerID)
+        NavigationView {
+            List(userList, id: \.id) { user in
+                NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbumsScreen, label: { Text(user.email) })
+                    .onTapGesture {
+                        viewModel.loginUser(userId: user.id)
+                        goToAlbumsScreen = true
+                    }
+            }.navigationTitle("Select an account")
+                .navigationBarTitleDisplayMode(.inline)
         }.onAppear {
             viewModel.usersState.watch { users in
                 guard let users = users else { return }
                 self.userList = users.list
-                self.pickerID += 1
             }
-        }.onDisappear {
-            viewModel.clear()
         }
     }
 }
 
 struct AlbumsScreen: View {
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     private let viewModel: AlbumListViewModel = InjectionHelper.shared.albumsViewModel
-    @State private var loggedUserName: String = ""
+    @State private var loggedUser: User = User.Companion().emptyObject()
+    @State private var albums: [AlbumWithThumbnail] = []
+    @State private var goToPhotosScreen = false
+    
     var body: some View {
-        VStack {
-            HStack {
-                Text(loggedUserName)
-                Spacer()
-                Button("Logout", action: {
-                    viewModel.logout()
-                    presentationMode.wrappedValue.dismiss()
-                })
-            }.padding(20)
-        }.onAppear {
-            viewModel.doInitViewModel()
-            viewModel.loggedUser.watch { user in
-                guard let user = user else { return }
-                loggedUserName = user.name
+        List(albums, id: \.id) { album in
+            NavigationLink(destination: PhotosScreen(albumId: album.id), isActive: $goToPhotosScreen, label: { AlbumRow(album: album) })
+                .onTapGesture {
+                    goToPhotosScreen = true
+                }
+        }.navigationTitle("\(loggedUser.name)'s albums")
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                viewModel.doInitViewModel()
+                viewModel.loggedUser.watch { user in
+                    guard let user = user else { return }
+                    loggedUser = user
+                }
+                viewModel.albums.watch { albums in
+                    guard let albums = albums else { return }
+                    self.albums = albums.list
+                }
             }
-        }.onDisappear {
-            viewModel.clear()
+    }
+}
+
+struct AlbumRow: View {
+    var album: AlbumWithThumbnail
+    var body: some View {
+        HStack {
+            if #available(iOS 15.0, *) {
+                AsyncImage(url: URL(string: album.albumThumbnailUrl))
+            }
+            Text(album.title)
+        }
+    }
+}
+
+struct PhotosScreen: View {
+    var albumId: Int64
+    private let viewModel = InjectionHelper.shared.photosViewModel
+    @State private var album = Album.Companion().emptyObject()
+    @State private var photos: [Photo] = []
+    @State private var viewPhoto = false
+    
+    var body: some View {
+        List(photos, id: \.id) { photo in
+            NavigationLink(destination: ViewPhotoScreen(photo: photo), isActive: $viewPhoto, label: { PhotoRow(photo: photo) })
+                .onTapGesture {
+                    viewPhoto = true
+                }
+        }.navigationTitle(album.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                viewModel.getPhotosForAlbum(albumId: albumId)
+                viewModel.getAlbum(albumId: albumId)
+                viewModel.album.watch { album in
+                    guard let album = album else { return }
+                    self.album = album
+                }
+                viewModel.photos.watch { photos in
+                    guard let photos = photos else { return }
+                    self.photos = photos.list
+                }
+            }
+    }
+}
+
+struct PhotoRow: View {
+    var photo: Photo
+    var body: some View {
+        HStack {
+            if #available(iOS 15.0, *) {
+                AsyncImage(url: URL(string: photo.thumbnailUrl))
+            }
+            Text(photo.title)
+        }
+    }
+}
+
+struct ViewPhotoScreen: View {
+    var photo: Photo
+    var body: some View {
+        if #available(iOS 15.0, *) {
+            AsyncImage(url: URL(string: photo.url))
         }
     }
 }

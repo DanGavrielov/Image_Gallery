@@ -76,7 +76,7 @@ fun PhotosScreen(
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        if (photos.isEmpty()) {
+        if (photos.list.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -89,7 +89,7 @@ fun PhotosScreen(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2)
             ) {
-                items(photos) {
+                items(photos.list) {
                     PhotoItem(
                         photo = it,
                         onPhotoClicked = onPhotoClicked
