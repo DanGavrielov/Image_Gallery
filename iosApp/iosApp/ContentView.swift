@@ -51,14 +51,20 @@ struct LoginScreen: View {
             if userList.isEmpty {
                 ProgressView().scaleEffect(2, anchor: .center)
             } else {
-                List(userList, id: \.id) { user in
-                    NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbumsScreen, label: { Text(user.email) })
-                        .onTapGesture {
-                            viewModel.loginUser(userId: user.id)
-                            goToAlbumsScreen = true
-                        }
-                }.navigationTitle("Select an account")
-                    .navigationBarTitleDisplayMode(.inline)
+                ZStack {
+                    List(userList, id: \.id) { user in
+                        Text(user.email)
+                            .onTapGesture {
+                                viewModel.loginUser(userId: user.id)
+                                goToAlbumsScreen = true
+                            }
+                    }.navigationTitle("Select an account")
+                        .navigationBarTitleDisplayMode(.inline)
+                    
+                    NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbumsScreen) {
+                        EmptyView()
+                    }
+                }
             }
         }.onAppear {
             viewModel.usersState.watch { users in
@@ -75,6 +81,7 @@ struct AlbumsScreen: View {
     @State private var loggedUser: User = User.Companion().emptyObject()
     @State private var albums: [AlbumWithThumbnail] = []
     @State private var goToPhotosScreen = false
+    @State private var selectedAlbumID: Int64 = 0
     
     private var items: [GridItem] {
         Array(repeating: .init(.adaptive(minimum: 120)), count: 2)
@@ -86,8 +93,9 @@ struct AlbumsScreen: View {
                 ProgressView().scaleEffect(2, anchor: .center)
             } else {
                 List(albums, id: \.id) { album in
-                    NavigationLink(destination: PhotosScreen(albumId: album.id), isActive: $goToPhotosScreen, label: { AlbumRow(album: album) })
+                    AlbumRow(album: album)
                         .onTapGesture {
+                            selectedAlbumID = album.id
                             goToPhotosScreen = true
                         }
                 }.navigationTitle("\(loggedUser.name)'s albums")
@@ -100,6 +108,8 @@ struct AlbumsScreen: View {
                             presentationMode.wrappedValue.dismiss()
                         })
                     }
+                
+                NavigationLink(destination: PhotosScreen(albumId: selectedAlbumID), isActive: $goToPhotosScreen, label: { EmptyView() })
             }
         }.onAppear {
             viewModel.doInitViewModel()
