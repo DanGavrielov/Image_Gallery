@@ -14,6 +14,23 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
+struct SplashScreen: View {
+    private let viewModel: SplashViewModel = InjectionHelper.shared.splashViewModel
+    var body: some View {
+        ProgressView()
+            .scaleEffect(2, anchor: .center)
+            .onAppear {
+                viewModel.isUserLoggedIn(completionHandler: { loggedIn, _ in
+                    if loggedIn as! Bool {
+                        // navigate to albums
+                    } else {
+                        // navigate to login
+                    }
+                })
+            }
+    }
+}
+
 struct LoginScreen: View {
     private let viewModel: LoginViewModel = InjectionHelper.shared.loginViewModel
     @State private var userList: [User] = []
@@ -21,14 +38,18 @@ struct LoginScreen: View {
     
     var body: some View {
         NavigationView {
-            List(userList, id: \.id) { user in
-                NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbumsScreen, label: { Text(user.email) })
-                    .onTapGesture {
-                        viewModel.loginUser(userId: user.id)
-                        goToAlbumsScreen = true
-                    }
-            }.navigationTitle("Select an account")
-                .navigationBarTitleDisplayMode(.inline)
+            if userList.isEmpty {
+                ProgressView().scaleEffect(2, anchor: .center)
+            } else {
+                List(userList, id: \.id) { user in
+                    NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbumsScreen, label: { Text(user.email) })
+                        .onTapGesture {
+                            viewModel.loginUser(userId: user.id)
+                            goToAlbumsScreen = true
+                        }
+                }.navigationTitle("Select an account")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
         }.onAppear {
             viewModel.usersState.watch { users in
                 guard let users = users else { return }
@@ -39,30 +60,48 @@ struct LoginScreen: View {
 }
 
 struct AlbumsScreen: View {
+    @Environment(\.presentationMode) var presentationMode
     private let viewModel: AlbumListViewModel = InjectionHelper.shared.albumsViewModel
     @State private var loggedUser: User = User.Companion().emptyObject()
     @State private var albums: [AlbumWithThumbnail] = []
     @State private var goToPhotosScreen = false
     
+    private var items: [GridItem] {
+      Array(repeating: .init(.adaptive(minimum: 120)), count: 2)
+    }
+    
     var body: some View {
-        List(albums, id: \.id) { album in
-            NavigationLink(destination: PhotosScreen(albumId: album.id), isActive: $goToPhotosScreen, label: { AlbumRow(album: album) })
-                .onTapGesture {
-                    goToPhotosScreen = true
-                }
-        }.navigationTitle("\(loggedUser.name)'s albums")
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                viewModel.doInitViewModel()
-                viewModel.loggedUser.watch { user in
-                    guard let user = user else { return }
-                    loggedUser = user
-                }
-                viewModel.albums.watch { albums in
-                    guard let albums = albums else { return }
-                    self.albums = albums.list
-                }
+        VStack {
+            if albums.isEmpty || loggedUser.name.isEmpty {
+                ProgressView().scaleEffect(2, anchor: .center)
+            } else {
+                List(albums, id: \.id) { album in
+                    NavigationLink(destination: PhotosScreen(albumId: album.id), isActive: $goToPhotosScreen, label: { AlbumRow(album: album) })
+                        .onTapGesture {
+                            goToPhotosScreen = true
+                        }
+                }.navigationTitle("\(loggedUser.name)'s albums")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        Button("Logout", action: {
+                            albums = []
+                            loggedUser = User.Companion().emptyObject()
+                            viewModel.logout()
+                            presentationMode.wrappedValue.dismiss()
+                        })
+                    }
             }
+        }.onAppear {
+            viewModel.doInitViewModel()
+            viewModel.loggedUser.watch { user in
+                guard let user = user else { return }
+                loggedUser = user
+            }
+            viewModel.albums.watch { albums in
+                guard let albums = albums else { return }
+                self.albums = albums.list
+            }
+        }
     }
 }
 
@@ -94,6 +133,7 @@ struct PhotosScreen: View {
         }.navigationTitle(album.title)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                print("Album ID passed to PhotosScreen ~> \(albumId)")
                 viewModel.getPhotosForAlbum(albumId: albumId)
                 viewModel.getAlbum(albumId: albumId)
                 viewModel.album.watch { album in

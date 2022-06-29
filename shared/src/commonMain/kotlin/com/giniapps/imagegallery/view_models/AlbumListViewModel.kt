@@ -17,12 +17,12 @@ class AlbumListViewModel(
     fun initViewModel() {
         coroutineScope.launch {
             val userId = repository.getLoggedInUserId()
-            albums.emit(
-                Albums(createAlbumsWithThumbnails(userId))
+            val albumData = Albums(
+                createAlbumsWithThumbnails(userId)
             )
-            loggedUser.emit(
-                repository.getLoggedInUserDetails(userId)
-            )
+            val user = repository.getLoggedInUserDetails(userId)
+            albums.emit(albumData)
+            loggedUser.emit(user)
         }
     }
 
@@ -31,6 +31,7 @@ class AlbumListViewModel(
         return albums.map {
             AlbumWithThumbnail(
                 id = it.id,
+                userId = it.userId,
                 title = it.title,
                 albumThumbnailUrl = repository.getPhotosForAlbumFromCache(it.id)[0].thumbnailUrl
             )
