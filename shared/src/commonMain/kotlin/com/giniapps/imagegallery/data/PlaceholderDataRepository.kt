@@ -16,7 +16,7 @@ class PlaceholderDataRepository(
     override suspend fun getUsers() = dataSource.getUsers()
 
     override suspend fun getLoggedInUserDetails(userId: Long) =
-        dataSource.getLoggedInUserDetails(userId) ?: User.emptyObject()
+        dataSource.getLoggedInUserDetails(userId)
 
     override suspend fun getAlbumsForUserAndSaveToCache(userId: Long): List<Album> {
         val albums = dataSource.getAlbumsForUser(userId)

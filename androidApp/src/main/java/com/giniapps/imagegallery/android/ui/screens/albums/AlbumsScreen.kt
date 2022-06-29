@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +38,10 @@ fun AlbumsScreen(
     val loggedUser by viewModel.loggedUser.collectAsState()
     val albums by viewModel.albums.collectAsState()
 
+    LaunchedEffect(true) {
+        viewModel.initViewModel()
+    }
+
     Column(modifier = modifier.padding(12.dp)) {
         UsernameScreenHeader(
             loggedUserName = loggedUser.name,
@@ -50,7 +55,7 @@ fun AlbumsScreen(
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         )
-        if (albums.isEmpty()) {
+        if (albums.list.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -63,7 +68,7 @@ fun AlbumsScreen(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2)
             ) {
-                items(albums) {
+                items(albums.list) {
                     AlbumItem(
                         album = it,
                         onAlbumClicked = onAlbumClicked

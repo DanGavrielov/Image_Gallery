@@ -9,5 +9,6 @@ actual fun KMMContext.saveLoggedUserDetails(userId: Long) {
 }
 
 actual fun KMMContext.getLoggedUserDetails(): Long {
-    return NSUserDefaults.standardUserDefaults.integerForKey(UserIdPrefKey)
+    val userId = NSUserDefaults.standardUserDefaults.integerForKey(UserIdPrefKey)
+    return if (userId == 0L) -1 else userId
 }
