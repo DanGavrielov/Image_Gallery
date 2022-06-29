@@ -3,7 +3,7 @@ import shared
 
 struct ContentView: View {
     var body: some View {
-        LoginScreen()
+        SplashScreen()
     }
 }
 
@@ -16,18 +16,28 @@ struct ContentView_Previews: PreviewProvider {
 
 struct SplashScreen: View {
     private let viewModel: SplashViewModel = InjectionHelper.shared.splashViewModel
+    @State private var goToAlbums = false
+    @State private var goToLogin = false
     var body: some View {
-        ProgressView()
-            .scaleEffect(2, anchor: .center)
-            .onAppear {
-                viewModel.isUserLoggedIn(completionHandler: { loggedIn, _ in
-                    if loggedIn as! Bool {
-                        // navigate to albums
-                    } else {
-                        // navigate to login
-                    }
-                })
+        NavigationView {
+            VStack {
+                NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbums) {
+                    ProgressView().scaleEffect(2, anchor: .center)
+                        .onAppear {
+                            viewModel.isUserLoggedIn(completionHandler: { loggedIn, _ in
+                                if loggedIn as! Bool {
+                                    goToAlbums = true
+                                } else {
+                                    goToLogin = true
+                                }
+                            })
+                        }
+                }
+                NavigationLink(destination: LoginScreen().navigationBarBackButtonHidden(true), isActive: $goToLogin) {
+                    EmptyView()
+                }
             }
+        }
     }
 }
 
@@ -37,7 +47,7 @@ struct LoginScreen: View {
     @State private var goToAlbumsScreen = false
     
     var body: some View {
-        NavigationView {
+        VStack {
             if userList.isEmpty {
                 ProgressView().scaleEffect(2, anchor: .center)
             } else {
@@ -67,7 +77,7 @@ struct AlbumsScreen: View {
     @State private var goToPhotosScreen = false
     
     private var items: [GridItem] {
-      Array(repeating: .init(.adaptive(minimum: 120)), count: 2)
+        Array(repeating: .init(.adaptive(minimum: 120)), count: 2)
     }
     
     var body: some View {

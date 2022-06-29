@@ -17,6 +17,7 @@ class AlbumListViewModel(
     fun initViewModel() {
         coroutineScope.launch {
             val userId = repository.getLoggedInUserId()
+            if (userId == -1L) return@launch
             val albumData = Albums(
                 createAlbumsWithThumbnails(userId)
             )
