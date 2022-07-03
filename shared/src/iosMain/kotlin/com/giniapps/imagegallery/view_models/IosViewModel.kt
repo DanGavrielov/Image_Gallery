@@ -10,10 +10,8 @@ actual abstract class SharedViewModel {
     private var hasCleared = false
     actual val coroutineScope: CoroutineScope by lazy {
         val result = CloseableCoroutineScope(SupervisorJob() + Dispatchers.Main)
-
         if (hasCleared)
             closeWithRuntimeException(result)
-
         return@lazy result
     }
 

@@ -10,7 +10,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 
 internal class PlaceholderApiService(
-    private val httpApiClient: HttpClient
+    override val httpApiClient: HttpClient
 ) : DataSource {
     override suspend fun getUsers(): List<User> {
         return makeRequest(

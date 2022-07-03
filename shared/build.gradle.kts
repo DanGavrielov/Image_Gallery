@@ -7,7 +7,7 @@ plugins {
 
 kotlin {
     android()
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -40,13 +40,15 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(kotlin("test-annotations-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.3")
             }
         }
         val androidMain by getting {
             dependencies {
                 api("io.ktor:ktor-client-okhttp:$ktorVersion")
                 api("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
-                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1")
+                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0")
                 api("io.insert-koin:koin-android:$koinVersion")
                 api("io.insert-koin:koin-androidx-compose:$koinVersion")
             }
@@ -84,6 +86,9 @@ android {
         minSdk = 21
         targetSdk = 32
     }
+}
+dependencies {
+    testImplementation("org.testng:testng:6.9.6")
 }
 
 sqldelight {

@@ -28,8 +28,6 @@ fun initKoin(appDeclaration: KoinAppDeclaration = { }) {
     }
 }
 
-fun initKoin() = initKoin { }
-
 val repositoryModule = module {
     factory {
         HttpClient {

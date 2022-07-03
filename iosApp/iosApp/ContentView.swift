@@ -16,24 +16,23 @@ struct ContentView_Previews: PreviewProvider {
 
 struct SplashScreen: View {
     private let viewModel: SplashViewModel = InjectionHelper.shared.splashViewModel
-    @State private var goToAlbums = false
-    @State private var goToLogin = false
+    @State private var navigateTo: String? = nil
     var body: some View {
         NavigationView {
             VStack {
-                NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), isActive: $goToAlbums) {
+                NavigationLink(destination: AlbumsScreen().navigationBarBackButtonHidden(true), tag: "albums", selection: $navigateTo) {
                     ProgressView().scaleEffect(2, anchor: .center)
                         .onAppear {
                             viewModel.isUserLoggedIn(completionHandler: { loggedIn, _ in
                                 if loggedIn as! Bool {
-                                    goToAlbums = true
+                                    self.navigateTo = "albums"
                                 } else {
-                                    goToLogin = true
+                                    self.navigateTo = "login"
                                 }
                             })
                         }
                 }
-                NavigationLink(destination: LoginScreen().navigationBarBackButtonHidden(true), isActive: $goToLogin) {
+                NavigationLink(destination: LoginScreen().navigationBarBackButtonHidden(true), tag: "login", selection: $navigateTo) {
                     EmptyView()
                 }
             }
@@ -101,7 +100,7 @@ struct AlbumsScreen: View {
                             albums = []
                             loggedUser = User.Companion().emptyObject()
                             viewModel.logout()
-                            presentationMode.wrappedValue.dismiss()
+                            self.presentationMode.wrappedValue.dismiss()
                         })
                     }
                 
